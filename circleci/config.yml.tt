@@ -1,0 +1,146 @@
+version: 2.1
+
+orbs:
+  browser-tools: circleci/browser-tools@1.1.0
+
+executors:
+  ruby:
+    docker:
+      - image: cimg/ruby:<%= RUBY_VERSION %>-browsers
+        environment:
+          PGHOST: 127.0.0.1
+          PGUSER: postgres
+          PGPASS: postgres
+          RAILS_ENV: test
+          HEADLESS_CHROME: "1"
+      - image: circleci/postgres:12-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+  heroku:
+    docker:
+      - image: buildpack-deps:trusty
+
+commands:
+  bundle_install:
+    description: Install Ruby dependencies with Bundler
+    steps:
+      - restore_cache:
+          keys:
+            - bundle-v1-{{ arch }}-{{ checksum ".ruby-version" }}-{{ checksum "Gemfile.lock" }}
+            - bundle-v1-{{ arch }}-{{ checksum ".ruby-version" }}-
+      - run:
+          name: Install Ruby Dependencies
+          command: |
+            gem install bundler -v <%=  Bundler::VERSION %> --conservative --no-document
+            bundle config --local deployment true
+            bundle config --local path vendor/bundle
+            bundle config --local without development:production
+            bundle check || (bundle install --jobs=4 --retry=3 && bundle clean)
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: bundle-v1-{{ arch }}-{{ checksum ".ruby-version" }}-{{ checksum "Gemfile.lock" }}
+  push_to_heroku:
+    steps:
+      - run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+  set_up_database:
+    steps:
+      - run:
+          name: Set Up Database
+          command: |
+            bundle exec rake db:setup
+  yarn_install:
+    description: Install JS dependencies with Yarn
+    steps:
+      - restore_cache:
+          keys:
+            - yarn-cache-v1-{{ arch }}-{{ checksum "yarn.lock" }}
+            - yarn-cache-v1-{{ arch }}
+      - run:
+          name: Install JS Dependencies
+          command: yarn install --frozen-lockfile --cache-folder .yarn-cache
+      - save_cache:
+          paths:
+            - .yarn-cache
+          key: yarn-cache-v1-{{ arch }}-{{ checksum "yarn.lock" }}
+
+jobs:
+  deploy:
+    executor: heroku
+    steps:
+      - checkout
+      - push_to_heroku
+  static_analysis:
+    executor: ruby
+    steps:
+      - checkout
+      - bundle_install
+      - yarn_install
+      - run:
+          name: Run Overcommit
+          command: |
+            gem install overcommit
+            git config --local user.name "Circle CI"
+            git config --local user.email ci@example.com
+            overcommit --sign
+            overcommit --run
+      - run:
+          name: Run Security Audits
+          command: |
+            bundle exec brakeman -q --no-summary
+            bundle exec bundle-audit check --update -v
+  test:
+    executor: ruby
+    steps:
+      - checkout
+      - bundle_install
+      - yarn_install
+      - set_up_database
+      - run:
+          name: Run Tests
+          command: bundle exec rake test TESTOPTS="--ci-dir=./reports"
+      - store_test_results:
+          path: ./reports
+  test_system:
+    executor: ruby
+    steps:
+      - browser-tools/install-chrome
+      - checkout
+      - bundle_install
+      - yarn_install
+      - set_up_database
+      - run:
+          name: Run System Tests
+          command: |
+            bundle exec rake webdrivers:chromedriver:update
+            bundle exec rake test:system TESTOPTS="--ci-dir=./reports"
+      - store_test_results:
+          path: ./reports
+      - store_artifacts:
+          path: ./tmp/screenshots
+          destination: screenshots
+
+workflows:
+  version: 2
+  commit-workflow:
+    jobs:
+      - static_analysis
+      - test
+      - test_system
+      - deploy:
+          filters:
+            branches:
+              only: main
+  cron-workflow:
+    triggers:
+      - schedule:
+          cron: "0 13 * * 1,2,3,4,5"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - static_analysis
+      - test
+      - test_system

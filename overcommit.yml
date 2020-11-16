@@ -1,0 +1,36 @@
+gemfile: false
+verify_signatures: false
+
+PreCommit:
+  BundleCheck:
+    enabled: true
+
+  FixMe:
+    enabled: true
+    keywords: ["FIXME"]
+    exclude:
+      - .overcommit.yml
+
+  LocalPathsInGemfile:
+    enabled: true
+
+  RailsSchemaUpToDate:
+    enabled: true
+
+  RuboCop:
+    enabled: true
+    required_executable: bundle
+    command: ["bundle", "exec", "rubocop"]
+    on_warn: fail
+
+  TrailingWhitespace:
+    enabled: true
+    exclude:
+      - "**/db/structure.sql"
+
+  YarnCheck:
+    enabled: true
+
+PostCheckout:
+  ALL:
+    quiet: true
