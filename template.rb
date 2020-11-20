@@ -59,6 +59,7 @@ def apply_self!
     run 'cp config/webpack/production.js config/webpack/staging.js'
     run 'cp config/environments/production.rb config/environments/staging.rb'
     run 'rubocop -A'
+    run 'overcommit --install'
 
     git :init unless existing_repository?
     git checkout: "-b main" unless existing_commits?
