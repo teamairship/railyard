@@ -22,9 +22,19 @@ def add_template_repository_to_source_path
   end
 end
 
+def existing_commits?
+  system("git log > /dev/null 2>&1")
+end
+
+def existing_repository?
+  @existing_repository ||= (File.exist?(".git") || :nope)
+  @existing_repository == true
+end
+
 def apply_self!
   add_template_repository_to_source_path
 
+  copy_file 'env.example'
   copy_file 'Gemfile', force: true
   copy_file 'Guardfile'
   copy_file 'Procfile.dev'
@@ -33,17 +43,25 @@ def apply_self!
   copy_file 'overcommit.yml', '.overcommit.yml'
   copy_file 'rubocop.yml', '.rubocop.yml'
 
+  apply 'circleci/template.rb'
+  apply 'config/template.rb'
+
   if yes?('Do you use rvm?')
     template 'ruby-gemset.tt', '.ruby-gemset', force: true
   end
-
-  apply 'circleci/template.rb'
 
   after_bundle do
     rails_command 'db:drop db:create'
     run 'bin/setup'
     rails_command 'active_storage:install'
     rails_command 'db:migrate'
+
+    run 'cp config/webpack/production.js config/webpack/staging.js'
+    run 'cp config/environments/production.rb config/environments/staging.rb'
+    run 'rubocop -A'
+
+    git :init unless existing_repository?
+    git checkout: "-b main" unless existing_commits?
   end
 end
 
