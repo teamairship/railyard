@@ -18,9 +18,9 @@ gem 'webpacker', '~> 4.0'
 
 group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
-  gem 'dotenv-rails', '~> 2.7'
-  gem 'factory_bot_rails', '~> 6.1'
-  gem 'faker', '~> 2.11.0'
+  gem 'dotenv-rails'
+  gem 'factory_bot_rails'
+  gem 'faker'
   gem 'guard'
   gem 'guard-brakeman'
   gem 'guard-minitest'
@@ -38,16 +38,17 @@ end
 
 group :development do
   gem 'foreman'
-  gem 'listen', '~> 3.2'
+  gem 'listen'
   gem 'overcommit'
   gem 'spring'
-  gem 'spring-watcher-listen', '~> 2.0.0'
-  gem 'web-console', '>= 3.3.0'
+  gem 'spring-watcher-listen'
+  gem 'web-console'
 end
 
 group :test do
-  gem 'capybara', '>= 2.15'
+  gem 'capybara'
   gem 'database_cleaner'
+  gem 'minitest-retry'
   gem 'selenium-webdriver'
   gem 'webdrivers'
 end

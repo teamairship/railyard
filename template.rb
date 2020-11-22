@@ -45,6 +45,7 @@ def apply_self!
 
   apply 'circleci/template.rb'
   apply 'config/template.rb'
+  apply 'test/template.rb'
 
   if yes?('Do you use rvm?')
     template 'ruby-gemset.tt', '.ruby-gemset', force: true
@@ -55,6 +56,7 @@ def apply_self!
     run 'bin/setup'
     rails_command 'active_storage:install'
     rails_command 'db:migrate'
+    generate 'pundit:install'
 
     run 'cp config/webpack/production.js config/webpack/staging.js'
     run 'cp config/environments/production.rb config/environments/staging.rb'
