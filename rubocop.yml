@@ -4,6 +4,7 @@ require:
 
 AllCops:
   TargetRubyVersion: 2.7
+  NewCops: enable
   Exclude:
     - db/schema.rb
     - db/seeds/**/*
@@ -211,8 +212,6 @@ Style/Documentation:
 
 Style/ExplicitBlockArgument:
   Enabled: true
-  Exclude:
-    - app/domain/application_handler.rb
 
 Style/ExponentialNotation:
   Enabled: true
