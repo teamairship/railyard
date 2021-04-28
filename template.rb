@@ -1,7 +1,7 @@
 require 'bundler'
 require 'json'
-require "fileutils"
-require "shellwords"
+require 'fileutils'
+require 'shellwords'
 
 def add_template_repository_to_source_path
   if __FILE__ =~ %r{\Ahttps?://}
@@ -36,6 +36,8 @@ def apply_self!
 
   copy_file 'env.example'
   copy_file 'Gemfile', force: true
+  copy_file 'package.json', force: true
+  copy_file '.eslintrc.js'
   copy_file 'Guardfile'
   copy_file 'Procfile.dev'
   copy_file 'foreman', '.foreman'
