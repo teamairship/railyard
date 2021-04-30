@@ -31,6 +31,12 @@ PreCommit:
   YarnCheck:
     enabled: true
 
+  EsLint:
+    enabled: true
+    on_warn: pass
+    required_executable: './node_modules/.bin/eslint'
+    command: ['./node_modules/.bin/eslint']
+
 PostCheckout:
   ALL:
     quiet: true
