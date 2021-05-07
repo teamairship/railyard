@@ -17,6 +17,7 @@ gem 'turbolinks', '~> 5'
 gem 'webpacker', '~> 5.0'
 
 group :development, :test do
+  gem 'bundle-audit'
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
@@ -48,6 +49,7 @@ end
 group :test do
   gem 'capybara'
   gem 'database_cleaner'
+  gem 'minitest-ci'
   gem 'minitest-retry'
   gem 'selenium-webdriver'
   gem 'webdrivers'
