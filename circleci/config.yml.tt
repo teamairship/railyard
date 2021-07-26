@@ -1,12 +1,12 @@
 version: 2.1
 
 orbs:
-  browser-tools: circleci/browser-tools@1.1.0
+  browser-tools: circleci/browser-tools@1.1.3
 
 executors:
   ruby:
     docker:
-      - image: cimg/ruby:<%= RUBY_VERSION %>-browsers
+      - image: circleci/ruby:<%= RUBY_VERSION %>-browsers-node-browsers
         environment:
           PGHOST: 127.0.0.1
           PGUSER: postgres
