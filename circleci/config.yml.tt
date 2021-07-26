@@ -6,7 +6,7 @@ orbs:
 executors:
   ruby:
     docker:
-      - image: circleci/ruby:<%= RUBY_VERSION %>-browsers-node-browsers
+      - image: circleci/ruby:<%= RUBY_VERSION %>-node-browsers
         environment:
           PGHOST: 127.0.0.1
           PGUSER: postgres
