@@ -1,0 +1,96 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+      - ./db/dumps:/db/dumps
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: <%= @app_name %>_development
+      PGPORT: 5432
+  redis:
+    image: redis:5.0.7
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./tmp/redis:/var/lib/redis/data
+  webpacker:
+    build: .
+    command: ./bin/webpack-dev-server
+    volumes:
+      - .:/app
+    ports:
+      - '3035:3035'
+    environment:
+      - NODE_ENV=development
+      - WEBPACKER_DEV_SERVER_HOST=0.0.0.0
+      - RAILS_ENV=development
+  app:
+    build: .
+    tty: true
+    stdin_open: true
+    # command: bash -c "rm -f tmp/pids/server.pid && bundle exec rdebug-ide --debug --host 0.0.0.0 --port 1234 -- bundle exec rails s -p 4000 -b '0.0.0.0'"
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - .:/app
+      - ~/.ssh:/root/.ssh
+    ports:
+      - "1234:1234"
+      - "3000:3000"
+      - "26162:26162"
+    depends_on:
+      - db
+      - redis
+      - webpacker
+    environment:
+      - RAILS_ENV=development
+      - PGHOST=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=<%= @app_name %>_development
+      - PGPORT=5432
+      - WEBPACKER_DEV_SERVER_HOST=webpacker
+      - REDIS_URL=redis://redis:6379/0
+  test:
+    build: .
+    tty: true
+    stdin_open: true
+    command: bash -c "bundle exec rails spec"
+    volumes:
+      - .:/app
+      - ~/.ssh:/root/.ssh
+    depends_on:
+      - db
+      - redis
+    environment:
+      - RAILS_ENV=test
+      - PGHOST=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=<%= @app_name %>_test
+      - PGPORT=5432
+      - REDIS_URL=redis://redis:6379/0
+  sidekiq:
+    build: .
+    command: bundle exec sidekiq
+    volumes:
+      - .:/app
+      - ~/.ssh:/root/.ssh
+    depends_on:
+      - db
+      - redis
+    environment:
+      - RAILS_ENV=development
+      - PGHOST=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=<%= @app_name %>_development
+      - PGPORT=5432
+      - WEBPACKER_DEV_SERVER_HOST=webpacker
+      - REDIS_URL=redis://redis:6379/0
+      - RAILS_HOST=${RAILS_HOST:-}

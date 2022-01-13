@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bundler'
 require 'json'
 require 'fileutils'
@@ -5,14 +7,14 @@ require 'shellwords'
 
 def add_template_repository_to_source_path
   if __FILE__ =~ %r{\Ahttps?://}
-    require "tmpdir"
-    source_paths.unshift(tempdir = Dir.mktmpdir("railyard-"))
+    require 'tmpdir'
+    source_paths.unshift(tempdir = Dir.mktmpdir('railyard-'))
     at_exit { FileUtils.remove_entry(tempdir) }
     git clone: [
-      "--quiet",
-      "https://github.com/teamairship/railyard.git",
+      '--quiet',
+      'https://github.com/teamairship/railyard.git',
       tempdir
-    ].map(&:shellescape).join(" ")
+    ].map(&:shellescape).join(' ')
 
     if (branch = __FILE__[%r{railyard/(.+)/template.rb}, 1])
       Dir.chdir(tempdir) { git checkout: branch }
@@ -23,12 +25,11 @@ def add_template_repository_to_source_path
 end
 
 def existing_commits?
-  system("git log > /dev/null 2>&1")
+  system('git log > /dev/null 2>&1')
 end
 
-def existing_repository?
-  @existing_repository ||= (File.exist?(".git") || :nope)
-  @existing_repository == true
+def docker?
+  @docker ||= yes?('Do you want to use Docker?')
 end
 
 def apply_self!
@@ -49,15 +50,19 @@ def apply_self!
   apply 'config/template.rb'
   apply 'test/template.rb'
 
-  if yes?('Do you use rvm?')
-    template 'ruby-gemset.tt', '.ruby-gemset', force: true
+  template 'ruby-gemset.tt', '.ruby-gemset', force: true if yes?('Do you use rvm?')
+
+  if docker?
+    apply 'bin/template.rb'
+    template 'docker-compose.yml.tt', 'docker-compose.yml'
+    template 'Dockerfile.tt', 'Dockerfile'
   end
 
   after_bundle do
-    rails_command 'db:drop db:create'
-    run 'bin/setup'
+    rails_command 'db:drop db:create' unless docker?
+    run 'bin/setup' unless docker?
     rails_command 'active_storage:install'
-    rails_command 'db:migrate'
+    rails_command 'db:migrate' unless docker?
     generate 'pundit:install'
 
     run 'cp config/webpack/production.js config/webpack/staging.js'
@@ -65,8 +70,10 @@ def apply_self!
     run 'rubocop -A'
     run 'overcommit --install'
 
+    run 'docker build .' if yes?('Do you want to run docker build?')
+
     git :init unless existing_repository?
-    git checkout: "-b main" unless existing_commits?
+    git checkout: '-b main' unless existing_commits?
   end
 end
 

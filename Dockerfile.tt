@@ -1,0 +1,65 @@
+FROM ruby:<%= RUBY_VERSION %>-alpine AS build-env
+
+ARG APP_ROOT=/app
+ARG BUILD_PACKAGES="build-base curl-dev git bash libxml2-dev"
+ARG DEV_PACKAGES="postgresql-dev yaml-dev zlib-dev nodejs yarn "
+ARG NOKOGIRI_PACKAGES="gcc ruby-dev libc-dev build-base"
+ARG RUBY_PACKAGES="tzdata postgresql-client nodejs bash less"
+ARG ACTIVESTORAGE_PACKAGES="poppler poppler-utils ffmpeg imagemagick"
+
+ENV BUNDLE_APP_CONFIG="$APP_ROOT/.bundle"
+
+ARG PGPORT=${PGPORT}
+ENV PGPORT=${PGPORT}
+
+ARG PGPORT=${PORT}
+ENV PGPORT=${PORT}
+
+WORKDIR $APP_ROOT
+
+# install packages
+RUN apk update \
+      && apk upgrade \
+      && apk add --update --no-cache \
+      $BUILD_PACKAGES $DEV_PACKAGES $NOKOGIRI_PACKAGES $RUBY_PACKAGES $ACTIVESTORAGE_PACKAGES
+
+
+# Install Bundler
+RUN gem install bundler -v '2.1.4'
+
+# Install gems that don't change often and take time to install (and dependencies)
+# NOTE: Update applicable gem versions here when you update in GEMFILE
+RUN gem install mini_portile2 -v '2.4.0'
+RUN gem install nokogiri -v '1.10.3' --source 'https://rubygems.org/'
+RUN gem install pg -v '1.1.4'
+RUN gem install nio4r -v '2.3.1'
+RUN gem install ffi -v '1.11.1'
+RUN gem install sassc -v '2.0.1' # Uncomment when adding bootstrap
+
+COPY Gemfile* package.json ./
+# COPY yarn.lock ./
+
+RUN set -x
+# RUN echo "PGPORT: "
+# RUN echo $PGPORT
+# RUN echo "PORT: "
+# RUN echo $PORT
+RUN pwd
+RUN bundle -v
+RUN ruby -v
+RUN set +x
+
+COPY . $APP_ROOT/.
+
+# Install remaining gems
+RUN bundle install
+
+RUN yarn install
+
+# Add a script to be executed every time the container starts.
+COPY bin/docker-entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+EXPOSE 3000
+CMD ["rails", "server", "-b", "0.0.0.0", "-p", "3000"]
