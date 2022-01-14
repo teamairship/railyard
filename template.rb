@@ -28,6 +28,11 @@ def existing_commits?
   system('git log > /dev/null 2>&1')
 end
 
+def existing_repository?
+  @existing_repository ||= (File.exist?(".git") || :nope)
+  @existing_repository == true
+end
+
 def docker?
   @docker ||= yes?('Do you want to use Docker?')
 end
@@ -56,6 +61,10 @@ def apply_self!
     apply 'bin/template.rb'
     template 'docker-compose.yml.tt', 'docker-compose.yml'
     template 'Dockerfile.tt', 'Dockerfile'
+    copy_file 'config/database.yml', force: true
+    copy_file 'config/cable.yml', force: true
+
+    gsub_file 'config/database.yml', 'DB_NAME', @app_name
   end
 
   after_bundle do
@@ -69,8 +78,6 @@ def apply_self!
     run 'cp config/environments/production.rb config/environments/staging.rb'
     run 'rubocop -A'
     run 'overcommit --install'
-
-    run 'docker build .' if yes?('Do you want to run docker build?')
 
     git :init unless existing_repository?
     git checkout: '-b main' unless existing_commits?

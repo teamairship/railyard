@@ -1,1 +1,1 @@
-template 'bin/docker-entrypoint.sh.tt', 'bin/docker-entrypoint.sh'
+copy_file 'bin/docker-entrypoint.sh'
