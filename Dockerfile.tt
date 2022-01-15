@@ -1,65 +1,44 @@
-FROM ruby:<%= RUBY_VERSION %>-alpine AS build-env
+# 1: Use ruby 2.7.3 as base:
+FROM ruby:2.7.3-alpine as development
 
-ARG APP_ROOT=/app
-ARG BUILD_PACKAGES="build-base curl-dev git bash libxml2-dev"
-ARG DEV_PACKAGES="postgresql-dev yaml-dev zlib-dev nodejs yarn "
-ARG NOKOGIRI_PACKAGES="gcc ruby-dev libc-dev build-base"
-ARG RUBY_PACKAGES="tzdata postgresql-client nodejs bash less"
-ARG ACTIVESTORAGE_PACKAGES="poppler poppler-utils ffmpeg imagemagick"
+# 2: We'll set the application path as the working directory
+WORKDIR /usr/src
 
-ENV BUNDLE_APP_CONFIG="$APP_ROOT/.bundle"
+# 3: We'll set the working dir as HOME and add the app's binaries path to $PATH:
+ENV HOME=/usr/src PATH=/usr/src/bin:$PATH
 
-ARG PGPORT=${PGPORT}
-ENV PGPORT=${PGPORT}
-
-ARG PGPORT=${PORT}
-ENV PGPORT=${PORT}
-
-WORKDIR $APP_ROOT
-
-# install packages
-RUN apk update \
-      && apk upgrade \
-      && apk add --update --no-cache \
-      $BUILD_PACKAGES $DEV_PACKAGES $NOKOGIRI_PACKAGES $RUBY_PACKAGES $ACTIVESTORAGE_PACKAGES
-
-
-# Install Bundler
-RUN gem install bundler -v '2.1.4'
-
-# Install gems that don't change often and take time to install (and dependencies)
-# NOTE: Update applicable gem versions here when you update in GEMFILE
-RUN gem install mini_portile2 -v '2.4.0'
-RUN gem install nokogiri -v '1.10.3' --source 'https://rubygems.org/'
-RUN gem install pg -v '1.1.4'
-RUN gem install nio4r -v '2.3.1'
-RUN gem install ffi -v '1.11.1'
-RUN gem install sassc -v '2.0.1' # Uncomment when adding bootstrap
-
-COPY Gemfile* package.json ./
-# COPY yarn.lock ./
-
-RUN set -x
-# RUN echo "PGPORT: "
-# RUN echo $PGPORT
-# RUN echo "PORT: "
-# RUN echo $PORT
-RUN pwd
-RUN bundle -v
-RUN ruby -v
-RUN set +x
-
-COPY . $APP_ROOT/.
-
-# Install remaining gems
-RUN bundle install
-
-RUN yarn install
-
-# Add a script to be executed every time the container starts.
-COPY bin/docker-entrypoint.sh /usr/bin/
-RUN chmod +x /usr/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
-
+# 4: Expose the app web port:
 EXPOSE 3000
+
+# 5: Set the default command:
 CMD ["rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+
+# --- Install development and runtime dependencies: ---
+
+# 6: Install the development & runtime packages:
+RUN set -ex && apk add --no-cache \
+  git \
+  bash \
+  build-base \
+  ca-certificates \
+  less \
+  libpq \
+  nodejs \
+  openssl \
+  postgresql-dev \
+  tzdata
+
+RUN set -ex npm install -g \
+  check-dependencies \
+  yarn
+
+# 7: Copy the project's Gemfile + lock:
+ADD Gemfile* /usr/src/
+
+# 8: Install the current project gems - they can be safely changed later during
+# development via `bundle install` or `bundle update`:
+RUN set -ex && bundle install --jobs=4 --retry=3
+
+COPY . /usr/src/
+
+RUN chmod +x /usr/src/bin/entrypoint-dev.sh

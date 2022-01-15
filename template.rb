@@ -60,11 +60,8 @@ def apply_self!
   if docker?
     apply 'bin/template.rb'
     template 'docker-compose.yml.tt', 'docker-compose.yml'
-    template 'Dockerfile.tt', 'Dockerfile'
-    copy_file 'config/database.yml', force: true
+    template 'Dockerfile.tt', 'Dockerfile.dev'
     copy_file 'config/cable.yml', force: true
-
-    gsub_file 'config/database.yml', 'DB_NAME', @app_name
   end
 
   after_bundle do

@@ -1,96 +1,81 @@
-version: '3.9'
+version: '3.4'
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  backend:
 
 services:
-  db:
-    image: postgres
-    volumes:
-      - ./tmp/db:/var/lib/postgresql/data
-      - ./db/dumps:/db/dumps
+  postgres:
+    image: postgres:9.6-alpine
     ports:
-      - "5432:5432"
+      - 5432:5432
+    volumes:
+      - ./db/dumps:/db/dumps                   # Mount the DB dumps folder
+      - ./tmp:/tmp                             # Mount tmp folder
+      - ./bin/restoredb:/bin/restoredb:ro      # Mount the 'restoredb' script
+      - ./bin/dumpdb:/bin/dumpdb:ro            # Mount the 'dumpdb' script
+      - postgres_data:/var/lib/postgresql/data # Mount the postgres data volume
+    networks:
+      - backend
     environment:
-      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: <%= @app_name %>_development
-      PGPORT: 5432
+  
   redis:
-    image: redis:5.0.7
+    image: redis:6.2.6
     ports:
       - '6379:6379'
     volumes:
-      - ./tmp/redis:/var/lib/redis/data
-  webpacker:
-    build: .
-    command: ./bin/webpack-dev-server
+      - redis_data:/var/lib/redis/data
+    networks:
+      - backend
+
+  test: &app
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: teamairship/docker-rails:development
+    entrypoint: /usr/src/bin/entrypoint-dev.sh
     volumes:
-      - .:/app
-    ports:
-      - '3035:3035'
-    environment:
-      - NODE_ENV=development
-      - WEBPACKER_DEV_SERVER_HOST=0.0.0.0
-      - RAILS_ENV=development
-  app:
-    build: .
-    tty: true
+      - .:/usr/src
+    networks:
+      - backend
     stdin_open: true
-    # command: bash -c "rm -f tmp/pids/server.pid && bundle exec rdebug-ide --debug --host 0.0.0.0 --port 1234 -- bundle exec rails s -p 4000 -b '0.0.0.0'"
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
-    volumes:
-      - .:/app
-      - ~/.ssh:/root/.ssh
-    ports:
-      - "1234:1234"
-      - "3000:3000"
-      - "26162:26162"
-    depends_on:
-      - db
-      - redis
-      - webpacker
-    environment:
-      - RAILS_ENV=development
-      - PGHOST=db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=<%= @app_name %>_development
-      - PGPORT=5432
-      - WEBPACKER_DEV_SERVER_HOST=webpacker
-      - REDIS_URL=redis://redis:6379/0
-  test:
-    build: .
     tty: true
-    stdin_open: true
-    command: bash -c "bundle exec rails spec"
-    volumes:
-      - .:/app
-      - ~/.ssh:/root/.ssh
     depends_on:
-      - db
-      - redis
-    environment:
-      - RAILS_ENV=test
-      - PGHOST=db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=<%= @app_name %>_test
-      - PGPORT=5432
-      - REDIS_URL=redis://redis:6379/0
+      - postgres
+    command: guard
+    environment: &app_env
+      # URL to connect to the database:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/<%= @app_name %>_test
+      RAILS_ENV: test
+      RACK_ENV: test
+      RAILS_LOG_TO_STDOUT: "true"
+      REDIS_URL: redis://redis:6379/0
+
+
   sidekiq:
-    build: .
+    <<: *app
     command: bundle exec sidekiq
-    volumes:
-      - .:/app
-      - ~/.ssh:/root/.ssh
     depends_on:
-      - db
+      - postgres
       - redis
+    networks:
+      - backend
     environment:
-      - RAILS_ENV=development
-      - PGHOST=db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=<%= @app_name %>_development
-      - PGPORT=5432
-      - WEBPACKER_DEV_SERVER_HOST=webpacker
-      - REDIS_URL=redis://redis:6379/0
-      - RAILS_HOST=${RAILS_HOST:-}
+      <<: *app_env
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app_development
+
+  web:
+    <<: *app
+    command: rails server -p 3000 -b 0.0.0.0
+    ports:
+      - ${DOCKER_RAILS_WEB_PORT:-3000}:3000
+    environment:
+      <<: *app_env
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/<%= @app_name %>_development
+      RAILS_ENV: development
+      RACK_ENV: development
