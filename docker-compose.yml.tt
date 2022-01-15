@@ -1,0 +1,81 @@
+version: '3.4'
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  backend:
+
+services:
+  postgres:
+    image: postgres:9.6-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db/dumps:/db/dumps                   # Mount the DB dumps folder
+      - ./tmp:/tmp                             # Mount tmp folder
+      - ./bin/restoredb:/bin/restoredb:ro      # Mount the 'restoredb' script
+      - ./bin/dumpdb:/bin/dumpdb:ro            # Mount the 'dumpdb' script
+      - postgres_data:/var/lib/postgresql/data # Mount the postgres data volume
+    networks:
+      - backend
+    environment:
+      POSTGRES_PASSWORD: postgres
+  
+  redis:
+    image: redis:6.2.6
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/var/lib/redis/data
+    networks:
+      - backend
+
+  test: &app
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: teamairship/docker-rails:development
+    entrypoint: /usr/src/bin/entrypoint-dev.sh
+    volumes:
+      - .:/usr/src
+    networks:
+      - backend
+    stdin_open: true
+    tty: true
+    depends_on:
+      - postgres
+    command: guard
+    environment: &app_env
+      # URL to connect to the database:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/<%= @app_name %>_test
+      RAILS_ENV: test
+      RACK_ENV: test
+      RAILS_LOG_TO_STDOUT: "true"
+      REDIS_URL: redis://redis:6379/0
+
+
+  sidekiq:
+    <<: *app
+    command: bundle exec sidekiq
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+    environment:
+      <<: *app_env
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app_development
+
+  web:
+    <<: *app
+    command: rails server -p 3000 -b 0.0.0.0
+    ports:
+      - ${DOCKER_RAILS_WEB_PORT:-3000}:3000
+    environment:
+      <<: *app_env
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/<%= @app_name %>_development
+      RAILS_ENV: development
+      RACK_ENV: development
