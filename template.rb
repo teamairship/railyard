@@ -5,14 +5,14 @@ require 'shellwords'
 
 def add_template_repository_to_source_path
   if __FILE__ =~ %r{\Ahttps?://}
-    require "tmpdir"
-    source_paths.unshift(tempdir = Dir.mktmpdir("railyard-"))
+    require 'tmpdir'
+    source_paths.unshift(tempdir = Dir.mktmpdir('railyard-'))
     at_exit { FileUtils.remove_entry(tempdir) }
     git clone: [
-      "--quiet",
-      "https://github.com/teamairship/railyard.git",
+      '--quiet',
+      'https://github.com/teamairship/railyard.git',
       tempdir
-    ].map(&:shellescape).join(" ")
+    ].map(&:shellescape).join(' ')
 
     if (branch = __FILE__[%r{railyard/(.+)/template.rb}, 1])
       Dir.chdir(tempdir) { git checkout: branch }
@@ -23,11 +23,11 @@ def add_template_repository_to_source_path
 end
 
 def existing_commits?
-  system("git log > /dev/null 2>&1")
+  system('git log > /dev/null 2>&1')
 end
 
 def existing_repository?
-  @existing_repository ||= (File.exist?(".git") || :nope)
+  @existing_repository ||= (File.exist?('.git') || :nope)
   @existing_repository == true
 end
 
@@ -49,8 +49,16 @@ def apply_self!
   apply 'config/template.rb'
   apply 'test/template.rb'
 
-  if yes?('Do you use rvm?')
-    template 'ruby-gemset.tt', '.ruby-gemset', force: true
+  template 'ruby-gemset.tt', '.ruby-gemset', force: true if yes?('Do you use rvm?')
+
+  if yes?('Will this application be multi-tenant?')
+    run 'bundle add acts_as_tenant --skip-install'
+    run 'bundle add pretender --skip-install'
+  end
+
+  if yes?('Will this application accept payments?')
+    run 'bundle add pay --skip-install'
+    run 'bundle add stripe --skip-install'
   end
 
   after_bundle do
@@ -60,13 +68,12 @@ def apply_self!
     rails_command 'db:migrate'
     generate 'pundit:install'
 
-    run 'cp config/webpack/production.js config/webpack/staging.js'
     run 'cp config/environments/production.rb config/environments/staging.rb'
     run 'rubocop -A'
     run 'overcommit --install'
 
     git :init unless existing_repository?
-    git checkout: "-b main" unless existing_commits?
+    git checkout: '-b main' unless existing_commits?
   end
 end
 

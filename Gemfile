@@ -3,18 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.7.3'
-
-gem 'bootsnap', '>= 1.4.4', require: false
-gem 'bugsnag'
-gem 'json-jwt', '~> 1.13'
-gem 'pg', '>= 0.18', '< 2.0'
-gem 'puma', '~> 4.1'
-gem 'pundit', '~> 2.1'
-gem 'rails', '~> 6.1.3', '>= 6.1.3.2'
-gem 'sass-rails', '>= 6'
-gem 'turbolinks', '~> 5'
-gem 'webpacker', '~> 5.0'
+ruby '3.0.2'
 
 group :development, :test do
   gem 'bundle-audit'
@@ -55,5 +44,19 @@ group :test do
   gem 'webdrivers'
 end
 
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem 'audited', '~> 5.0'
+gem 'bootsnap', '>= 1.4.4', require: false
+gem 'bugsnag'
+gem 'cssbundling-rails'
+gem 'jsbundling-rails'
+gem 'json-jwt', '~> 1.13'
+gem 'pg', '>= 0.18', '< 2.0'
+gem 'puma', '~> 4.1'
+gem 'pundit', '~> 2.1'
+gem 'rails', '~> 7.0.0'
+gem 'sassc-rails', '~> 2.1'
+gem 'stimulus-rails'
+gem 'turbo_flash'
+gem 'turbo-rails'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+gem 'webpacker', '~> 5.0'
