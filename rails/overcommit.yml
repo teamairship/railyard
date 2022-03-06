@@ -20,7 +20,7 @@ PreCommit:
   RuboCop:
     enabled: true
     required_executable: bundle
-    command: ["bundle", "exec", "rubocop"]
+    command: ["bundle", "exec", "standardrb --fix"]
     on_warn: fail
 
   TrailingWhitespace:
