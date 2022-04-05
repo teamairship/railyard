@@ -1,12 +1,12 @@
 # railyard
 
-Railyard is a Rails application template used to scaffold rails 6 projects.  Heavily influenced by mattbrictson/rails-template
+Railyard is a Rails application template used to scaffold rails 7 projects.  Heavily influenced by mattbrictson/rails-template
 
 ## Requirements
 
 This template currently works with:
 
-* Rails 6.0.x
+* Rails 7.0.x
 * Bundler 2.x
 * PostgreSQL
 * chromedriver

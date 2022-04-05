@@ -36,7 +36,6 @@ def apply_self!
 
   copy_file 'env.example'
   copy_file 'Gemfile', force: true
-  copy_file 'package.json', force: true
   copy_file '.eslintrc.js'
   copy_file 'Guardfile'
   copy_file 'Procfile.dev'
@@ -60,7 +59,6 @@ def apply_self!
     rails_command 'db:migrate'
     generate 'pundit:install'
 
-    run 'cp config/webpack/production.js config/webpack/staging.js'
     run 'cp config/environments/production.rb config/environments/staging.rb'
     run 'rubocop -A'
     run 'overcommit --install'
