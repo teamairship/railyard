@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Railyard
   class Cli < Thor
     include Thor::Actions
@@ -10,6 +12,8 @@ module Railyard
     desc "create APP", "creates a new rails app"
     def create(app)
       run "rails new #{app} -d postgresql -j esbuild -c tailwind -m ./rails/template.rb"
+    rescue error
+      p error
     end
 
     private
