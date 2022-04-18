@@ -3,6 +3,7 @@
 # lib = File.expand_path('../lib', __FILE__)
 # $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require_relative 'lib/railyard/version'
+require 'sprockets/railtie'
 
 Gem::Specification.new do |spec|
   spec.name          = 'Railyard'
@@ -19,12 +20,13 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activesupport'
   spec.add_dependency 'dotenv'
   spec.add_dependency 'httparty', '~> 0.14'
-  spec.add_dependency 'rails', '~> 6.0'
+  spec.add_dependency 'rails', '~> 7.0.2', '>= 7.0.2.3'
   spec.add_dependency 'terminal-table'
   spec.add_dependency 'thor', '~> 1.0'
 
+  spec.add_development_dependency 'standardrb'
   spec.add_development_dependency 'bundler', '~> 2.1'
-  spec.add_development_dependency 'rake', '~> 10.0'
+  # spec.add_development_dependency 'rake', '~> 12.2'
   spec.add_development_dependency 'rspec', '~> 3.0'
 
   # Specify which files should be added to the gem when it is released.
