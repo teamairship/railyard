@@ -26,7 +26,6 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'standardrb'
   spec.add_development_dependency 'bundler', '~> 2.1'
-  # spec.add_development_dependency 'rake', '~> 12.2'
   spec.add_development_dependency 'rspec', '~> 3.0'
 
   # Specify which files should be added to the gem when it is released.
