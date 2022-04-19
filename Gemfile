@@ -6,6 +6,11 @@ ruby "3.1.0"
 # Specify your gem's dependencies in railscaptain.gemspec
 gemspec
 
+gem 'bootsnap', require: false
+gem 'bugsnag'
+gem 'pg'
+gem 'overcommit'
+
 group :development, :test do
   gem 'codeclimate-test-reporter', '~> 1.0.0'
   gem "debug", platforms: %i[mri mingw x64_mingw]
