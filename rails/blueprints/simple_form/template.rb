@@ -10,6 +10,8 @@ def apply_self!
       gem "simple_form-tailwind"
       run "bundle install"
       generate "simple_form:tailwind:install"
+    else
+      generate "simple_form:install"
     end
   end
 end
