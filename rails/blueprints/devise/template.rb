@@ -48,67 +48,77 @@ def apply_self!
     insert_into_file "app/controllers/#{model_name}s_controller.rb", "#{user_controller_content}", before: /^end/
 
     create_file 'app/controllers/concerns/json_web_token.rb'
-    append_file 'app/controllers/concerns/json_web_token.rb' do
-      <<-RUBY
-      # frozen_string_literal: true
-
-      require "jwt"
-      module JsonWebToken
-        extend ActiveSupport::Concern
-        SECRET_KEY = Rails.application.secret_key_base
-
-        def jwt_encode(payload, exp = 7.days.from_now)
-          payload[:exp] = exp.to_i
-          JWT.encode(payload, SECRET_KEY)
-        end
-
-        def jwt_decode(token)
-          decoded = JWT.decode(token, SECRET_KEY)[0]
-          HashWithIndifferentAccess.new decoded
-        end
-      end
-      RUBY
-    end
-
-    insert_into_file "app/controllers/application_controller.rb", before: /^end/ do
-      <<-RUBY
-      include JsonWebToken
-
-      before_action :authenticate_request
-
-      private
-        def authenticate_request
-          header = request.headers["Authorization"]
-          header = header.split(" ").last if header
-          decoded = jwt_decode(header)
-          @current_user = User.find(decoded[:user_id])
-        end
-      RUBY
-    end
-
+    json_web_token_content
+    application_controller_content
     create_file 'app/controllers/authentication_controller.rb'
-    append_file 'app/controllers/authentication_controller.rb' do
-      <<-RUBY
-      # frozen_string_literal: true
-
-      class AuthenticationController < ApplicationController
-        skip_before_action :authenticate_request
-
-        def login
-          @user = User.find_by_email(params[:email])
-          if @user&.authenticate(params[:password])
-            token = jwt_encode(user_id: @user.id)
-            render json: { token: token }, status: :ok
-          else
-            render json: { error: 'unauthorized' }, status: :unauthorized
-          end
-        end
-      end
-      RUBY
-    end
+    authentication_controller_content
 
     route "  post '/auth/login', to: 'authentication#login'"
   end
+end
+
+def json_web_token_content
+append_file 'app/controllers/concerns/json_web_token.rb' do
+<<-RUBY
+# frozen_string_literal: true
+
+require "jwt"
+module JsonWebToken
+  extend ActiveSupport::Concern
+  SECRET_KEY = Rails.application.secret_key_base
+
+  def jwt_encode(payload, exp = 7.days.from_now)
+    payload[:exp] = exp.to_i
+    JWT.encode(payload, SECRET_KEY)
+  end
+
+  def jwt_decode(token)
+    decoded = JWT.decode(token, SECRET_KEY)[0]
+    HashWithIndifferentAccess.new decoded
+  end
+end
+RUBY
+end
+end
+
+def application_controller_content
+insert_into_file "app/controllers/application_controller.rb", before: /^end/ do
+  <<-RUBY
+  include JsonWebToken
+
+  before_action :authenticate_request
+
+  private
+    def authenticate_request
+      header = request.headers["Authorization"]
+      header = header.split(" ").last if header
+      decoded = jwt_decode(header)
+      @current_user = User.find(decoded[:user_id])
+    end
+  RUBY
+  end
+end
+
+def authentication_controller_content
+append_file 'app/controllers/authentication_controller.rb' do
+<<-RUBY
+# frozen_string_literal: true
+
+class AuthenticationController < ApplicationController
+  skip_before_action :authenticate_request
+
+  def login
+    @user = User.find_by_email(params[:email])
+    if @user&.authenticate(params[:password])
+      token = jwt_encode(user_id: @user.id)
+      render json: { token: token }, status: :ok
+    else
+      render json: { error: 'unauthorized' }, status: :unauthorized
+    end
+  end
+end
+RUBY
+end
 end
 
 apply_self!
