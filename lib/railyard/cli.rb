@@ -9,7 +9,7 @@ module Railyard
 
     desc "create APP", "creates a new rails app"
     def create(app)
-      run "rails new #{app} -d postgresql -j esbuild -c tailwind -m ./rails/template.rb"
+      run "rails new #{app} -d postgresql -j esbuild -m ./rails/template.rb"
     end
 
     private
