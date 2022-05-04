@@ -51,6 +51,7 @@ def apply_self!
     gem "guard-shell"
     gem "guard-spring"
     gem "standard"
+    gem "simplecov"
   end
 
   gem_group :development do

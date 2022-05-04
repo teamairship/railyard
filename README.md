@@ -1,19 +1,19 @@
 # railyard
 
-Railyard is a Rails application template used to scaffold rails 6 projects.  Heavily influenced by mattbrictson/rails-template
+Railyard is a Rails application template used to scaffold rails 6 projects. Heavily influenced by mattbrictson/rails-template
 
 ## Requirements
 
 This template currently works with:
 
-* Rails 6.0.x
-* Bundler 2.x
-* PostgreSQL
-* chromedriver
+- Rails 6.0.x
+- Bundler 2.x
+- PostgreSQL
+- chromedriver
 
 ## Installation
 
-*Optional.*
+_Optional._
 
 To make this the default Rails application template on your system, create a `~/.railsrc` file with these contents:
 
@@ -32,7 +32,7 @@ rails new blog \
   -m https://raw.githubusercontent.com/teamairship/railyard/main/template.rb
 ```
 
-*Remember that options must go after the name of the application.* The only database supported by this template is `postgresql`.
+_Remember that options must go after the name of the application._ The only database supported by this template is `postgresql`.
 
 If you’ve installed this template as your default (using `~/.railsrc` as described above), then all you have to do is run:
 
@@ -54,18 +54,19 @@ The template will perform the following steps:
 
 #### These gems are added to the standard Rails stack
 
-* Core
-    * Pundit
-    * TODO: sidekiq
-* Configuration
-    * [dotenv][] – for local configuration
-* Utilities
-    * TODO: [annotate][] – auto-generates schema documentation
-    * [guard][] – runs tests as you develop; mandatory for effective TDD
-    * [rubocop][] – enforces Ruby code style
-* Security
-    * [brakeman][] and [bundler-audit][] – detect security vulnerabilities
-* Testing
+- Core
+  - Pundit
+  - TODO: sidekiq
+- Configuration
+  - [dotenv][] – for local configuration
+- Utilities
+  - TODO: [annotate][] – auto-generates schema documentation
+  - [guard][] – runs tests as you develop; mandatory for effective TDD
+  - [rubocop][] – enforces Ruby code style
+  - [simplecov][] – code coverage tool
+- Security
+  - [brakeman][] and [bundler-audit][] – detect security vulnerabilities
+- Testing
 
 ## How does it work?
 
@@ -73,13 +74,13 @@ This project works by hooking into the standard Rails [application templates][] 
 
 Rails generators are very lightly documented; what you’ll find is that most of the heavy lifting is done by [Thor][]. The most common methods used by this template are Thor’s `copy_file`, `template`, and `gsub_file`. You can dig into the well-organized and well-documented [Thor source code][thor] to learn more.
 
-[sidekiq]:http://sidekiq.org
-[dotenv]:https://github.com/bkeepers/dotenv
-[annotate]:https://github.com/ctran/annotate_models
-[guard]:https://github.com/guard/guard
-[rubocop]:https://github.com/bbatsov/rubocop
-[brakeman]:https://github.com/presidentbeef/brakeman
-[bundler-audit]:https://github.com/rubysec/bundler-audit
-[application templates]:http://guides.rubyonrails.org/generators.html#application-templates
+[sidekiq]: http://sidekiq.org
+[dotenv]: https://github.com/bkeepers/dotenv
+[annotate]: https://github.com/ctran/annotate_models
+[guard]: https://github.com/guard/guard
+[rubocop]: https://github.com/bbatsov/rubocop
+[brakeman]: https://github.com/presidentbeef/brakeman
+[bundler-audit]: https://github.com/rubysec/bundler-audit
+[application templates]: http://guides.rubyonrails.org/generators.html#application-templates
 [template.rb]: template.rb
 [thor]: https://github.com/erikhuda/thor
