@@ -1,5 +1,5 @@
 def apply_self!
-  if yes?("Would you like to install rspec?")
+  if yes?("Would you like to install rspec?", :blue)
     FileUtils.rm_rf("test")
     gem_group :development, :test do
       gem 'rspec-rails'
@@ -20,12 +20,12 @@ def apply_self!
 end
 
 def devise_config 
-  if yes?("Do you have devise in your project?")
+  if yes?("Do you have devise in your project?", :blue)
     gsub_file 'spec/rails_helper.rb', "config.filter_rails_from_backtrace", "config.filter_rails_from_backtrace\n\tconfig.include Devise::Test::ControllerHelpers, type: :controller"
   end
 end
 def graphql_config
-  if yes?("Do you have graphql in your project?")
+  if yes?("Do you have graphql in your project?", :blue)
     empty_directory 'spec/graphql/mutations'
     empty_directory 'spec/graphql/queries'
     copy_file "blueprints/rspec/schema_spec", "spec/graphql/schema_spec.rb"
