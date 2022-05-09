@@ -1,72 +1,59 @@
 # railyard
 
-Railyard is a Rails application template used to scaffold rails 6 projects. Heavily influenced by mattbrictson/rails-template
+Railyard is a Rails application template used to scaffold rails projects. It provides a way to easily install application dependencies at the time of project creation.
 
-## Requirements
+## Dependencies
 
-This template currently works with:
+The project is currently setup to utilize Ruby 3.1.x and works with versions 6-7 of Rails. Although we do recommend using the latest release of Rails 7.
 
-- Rails 6.0.x
-- Bundler 2.x
-- PostgreSQL
-- chromedriver
+To utilize this project, please ensure you have whatever version of Ruby is specified in the Gemfile file in the root of the project.
 
 ## Installation
 
-_Optional._
-
-To make this the default Rails application template on your system, create a `~/.railsrc` file with these contents:
+To utilze the project pull down the repository from Github:
 
 ```
--d postgresql
--m https://raw.githubusercontent.com/teamairship/railyard/main/template.rb
+git clone git@github.com:teamairship/railyard.git [DESIRED DIRECTORY HERE]
+cd [DESIRED DIRECTORY HERE]
+```
+
+Ensure that you have the appropriate Ruby installed and gemset setup for the project then bundle install:
+
+```
+bundle install
+```
+
+Note that you can use the Rails version of your preference and will have to install that manually:
+
+```
+gem install rails
 ```
 
 ## Usage
 
-To generate a Rails application using this template, pass the `-m` option to `rails new`, like this:
+To see the available commands, run the following from the directory where Railyard is located:
 
 ```
-rails new blog \
-  -d postgresql \
-  -m https://raw.githubusercontent.com/teamairship/railyard/main/template.rb
+./bin/railyard
 ```
 
-_Remember that options must go after the name of the application._ The only database supported by this template is `postgresql`.
-
-If you’ve installed this template as your default (using `~/.railsrc` as described above), then all you have to do is run:
+To start scaffolding a project:
 
 ```
-rails new blog
+./bin/railyard create [PATH TO DESIRED DIRECTORY]
 ```
 
-## What does it do?
+Answer the questions about dependencies as you are prompted.
 
-The template will perform the following steps:
+If you see a message similar to `*** NOTE: If you are prompted to 'overwrite' ./bin/dev, press Y. Press enter to continue. ***` then enter y and press enter to continue.
 
-1. Generate your application files and directories
-2. Create the development and test databases
-3. Sets up active storage
-4. Sets up ci/cd
-5. TODO: Commit everything to git
+Change into the directory where you generated your app:
 
-## What is included?
-
-#### These gems are added to the standard Rails stack
-
-- Core
-  - Pundit
-  - TODO: sidekiq
-- Configuration
-  - [dotenv][] – for local configuration
-- Utilities
-  - TODO: [annotate][] – auto-generates schema documentation
-  - [guard][] – runs tests as you develop; mandatory for effective TDD
-  - [rubocop][] – enforces Ruby code style
-  - [simplecov][] – code coverage tool
-- Security
-  - [brakeman][] and [bundler-audit][] – detect security vulnerabilities
-- Testing
+```
+cd [DIRECTORY OF GENERATED APP]
+bundle install
+overcommit --install
+```
 
 ## How does it work?
 
