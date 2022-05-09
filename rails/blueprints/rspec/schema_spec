@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+# rubocop:disable RSpec/DescribeClass
+
+RSpec.describe 'Test Schema' do
+  it 'is up to date' do
+    current_defn = MyappSchema.to_definition
+    printout_defn = File.read(Rails.root.join('app/graphql/schema.graphql'))
+    assert_equal(current_defn, printout_defn, 'Update the printed schema with `bundle exec rake dump_schema`')
+  end
+end
+# rubocop:enable RSpec/DescribeClass

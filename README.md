@@ -1,71 +1,59 @@
 # railyard
 
-Railyard is a Rails application template used to scaffold rails 6 projects.  Heavily influenced by mattbrictson/rails-template
+Railyard is a Rails application template used to scaffold rails projects. It provides a way to easily install application dependencies at the time of project creation.
 
-## Requirements
+## Dependencies
 
-This template currently works with:
+The project is currently setup to utilize Ruby 3.1.x and works with versions 6-7 of Rails. Although we do recommend using the latest release of Rails 7.
 
-* Rails 6.0.x
-* Bundler 2.x
-* PostgreSQL
-* chromedriver
+To utilize this project, please ensure you have whatever version of Ruby is specified in the Gemfile file in the root of the project.
 
 ## Installation
 
-*Optional.*
-
-To make this the default Rails application template on your system, create a `~/.railsrc` file with these contents:
+To utilze the project pull down the repository from Github:
 
 ```
--d postgresql
--m https://raw.githubusercontent.com/teamairship/railyard/main/template.rb
+git clone git@github.com:teamairship/railyard.git [DESIRED DIRECTORY HERE]
+cd [DESIRED DIRECTORY HERE]
+```
+
+Ensure that you have the appropriate Ruby installed and gemset setup for the project then bundle install:
+
+```
+bundle install
+```
+
+Note that you can use the Rails version of your preference and will have to install that manually:
+
+```
+gem install rails
 ```
 
 ## Usage
 
-To generate a Rails application using this template, pass the `-m` option to `rails new`, like this:
+To see the available commands, run the following from the directory where Railyard is located:
 
 ```
-rails new blog \
-  -d postgresql \
-  -m https://raw.githubusercontent.com/teamairship/railyard/main/template.rb
+./bin/railyard
 ```
 
-*Remember that options must go after the name of the application.* The only database supported by this template is `postgresql`.
-
-If you’ve installed this template as your default (using `~/.railsrc` as described above), then all you have to do is run:
+To start scaffolding a project:
 
 ```
-rails new blog
+./bin/railyard create [PATH TO DESIRED DIRECTORY]
 ```
 
-## What does it do?
+Answer the questions about dependencies as you are prompted.
 
-The template will perform the following steps:
+If you see a message similar to `*** NOTE: If you are prompted to 'overwrite' ./bin/dev, press Y. Press enter to continue. ***` then enter y and press enter to continue.
 
-1. Generate your application files and directories
-2. Create the development and test databases
-3. Sets up active storage
-4. Sets up ci/cd
-5. TODO: Commit everything to git
+Change into the directory where you generated your app:
 
-## What is included?
-
-#### These gems are added to the standard Rails stack
-
-* Core
-    * Pundit
-    * TODO: sidekiq
-* Configuration
-    * [dotenv][] – for local configuration
-* Utilities
-    * TODO: [annotate][] – auto-generates schema documentation
-    * [guard][] – runs tests as you develop; mandatory for effective TDD
-    * [rubocop][] – enforces Ruby code style
-* Security
-    * [brakeman][] and [bundler-audit][] – detect security vulnerabilities
-* Testing
+```
+cd [DIRECTORY OF GENERATED APP]
+bundle install
+overcommit --install
+```
 
 ## How does it work?
 
@@ -73,13 +61,23 @@ This project works by hooking into the standard Rails [application templates][] 
 
 Rails generators are very lightly documented; what you’ll find is that most of the heavy lifting is done by [Thor][]. The most common methods used by this template are Thor’s `copy_file`, `template`, and `gsub_file`. You can dig into the well-organized and well-documented [Thor source code][thor] to learn more.
 
-[sidekiq]:http://sidekiq.org
-[dotenv]:https://github.com/bkeepers/dotenv
-[annotate]:https://github.com/ctran/annotate_models
-[guard]:https://github.com/guard/guard
-[rubocop]:https://github.com/bbatsov/rubocop
-[brakeman]:https://github.com/presidentbeef/brakeman
-[bundler-audit]:https://github.com/rubysec/bundler-audit
-[application templates]:http://guides.rubyonrails.org/generators.html#application-templates
+## MIT License
+
+Copyright 2022 Airship
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+[sidekiq]: http://sidekiq.org
+[dotenv]: https://github.com/bkeepers/dotenv
+[annotate]: https://github.com/ctran/annotate_models
+[guard]: https://github.com/guard/guard
+[rubocop]: https://github.com/bbatsov/rubocop
+[brakeman]: https://github.com/presidentbeef/brakeman
+[bundler-audit]: https://github.com/rubysec/bundler-audit
+[application templates]: http://guides.rubyonrails.org/generators.html#application-templates
 [template.rb]: template.rb
 [thor]: https://github.com/erikhuda/thor

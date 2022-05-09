@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift(File.expand_path '../../lib', __FILE__).uniq!
+
+require 'railyard'
+
+if ARGV.empty?
+  ARGV << 'help'
+end
+
+Railyard::Cli.start ARGV
