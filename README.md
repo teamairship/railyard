@@ -4,6 +4,8 @@ Railyard is a Rails application template used to scaffold rails projects. It pro
 
 ## Dependencies
 
+Ensure that NPM is up to date before generating an app.
+
 The project is currently setup to utilize Ruby 3.1.x and works with versions 6-7 of Rails. Although we do recommend using the latest release of Rails 7.
 
 To utilize this project, please ensure you have whatever version of Ruby is specified in the Gemfile file in the root of the project.
@@ -53,7 +55,15 @@ Change into the directory where you generated your app:
 cd [DIRECTORY OF GENERATED APP]
 bundle install
 overcommit --install
+yarn
+foreman start
 ```
+
+## Known Issues
+
+Make sure your node and npm versions are up to date or you might run into build command not fount issues when trying to run the generated app if using Rails 7. You will need to remove and regenerate the app once up to date.
+
+[https://stackoverflow.com/questions/70482086/rails-7-0-esbuild-running-app-gives-error-command-build-not-found](https://stackoverflow.com/questions/70482086/rails-7-0-esbuild-running-app-gives-error-command-build-not-found)
 
 ## How does it work?
 

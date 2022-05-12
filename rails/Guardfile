@@ -17,18 +17,19 @@
 #
 # and, you'll have to watch "config/Guardfile" instead of "Guardfile"
 
-guard :minitest, spring: 'bin/rails test', all_after_pass: false do
-  watch(%r{^app/(.+)\.rb$}) { |m| ["test/#{m[1]}", "test/#{m[1]}_test.rb"] }
-  watch(%r{^app/controllers/(admin|application)_controller\.rb$}) { 'test/controllers' }
-  watch(%r{^app/controllers/(.+)_controller\.rb$}) { |m| "test/integration/#{m[1]}_test.rb" }
-  watch(%r{^app/views/(.+)_mailer/.+}) { |m| "test/mailers/#{m[1]}_mailer_test.rb" }
-  watch(%r{^app/domain/(.+)\.rb$}) { |m| "test/domain/#{m[1]}_test.rb" }
-  watch(%r{^app/lib/(.+)\.rb$}) { |m| "test/app_lib/#{m[1]}_test.rb" }
-  watch(%r{^lib/(.+)\.rb$}) { |m| "test/lib/#{m[1]}_test.rb" }
-  watch(%r{^test/test_helper\.rb$}) { 'test' }
-  watch(%r{^test/.+_test\.rb$})
-  watch(%r{^app/views/(.*_mailer/)?([^/]+)\.erb$}) { ['test/mailers', 'test/integration'] }
-end
+# How do we conditionally specify minitest vs rspec here?
+# guard :minitest, spring: 'bin/rails test', all_after_pass: false do
+#   watch(%r{^app/(.+)\.rb$}) { |m| ["test/#{m[1]}", "test/#{m[1]}_test.rb"] }
+#   watch(%r{^app/controllers/(admin|application)_controller\.rb$}) { 'test/controllers' }
+#   watch(%r{^app/controllers/(.+)_controller\.rb$}) { |m| "test/integration/#{m[1]}_test.rb" }
+#   watch(%r{^app/views/(.+)_mailer/.+}) { |m| "test/mailers/#{m[1]}_mailer_test.rb" }
+#   watch(%r{^app/domain/(.+)\.rb$}) { |m| "test/domain/#{m[1]}_test.rb" }
+#   watch(%r{^app/lib/(.+)\.rb$}) { |m| "test/app_lib/#{m[1]}_test.rb" }
+#   watch(%r{^lib/(.+)\.rb$}) { |m| "test/lib/#{m[1]}_test.rb" }
+#   watch(%r{^test/test_helper\.rb$}) { 'test' }
+#   watch(%r{^test/.+_test\.rb$})
+#   watch(%r{^app/views/(.*_mailer/)?([^/]+)\.erb$}) { ['test/mailers', 'test/integration'] }
+# end
 
 guard :rubocop, cli: %w[-D -S] do
   watch(/.rubocop.yml/)
