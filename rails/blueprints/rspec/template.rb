@@ -15,7 +15,7 @@ def apply_self!
     empty_directory 'spec/controllers'
     empty_directory 'spec/factories'
     graphql_config
-    content = " - rubocop-rspec"
+    content = "  - rubocop-rspec\n"
     insert_into_file '.rubocop.yml', content, after: /require:\n/
   end
 end
