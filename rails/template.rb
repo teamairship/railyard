@@ -39,14 +39,15 @@ def apply_self!
   add_template_repository_to_source_path
 
   gem "bugsnag"
+  gem 'rubocop-rails', require: false
 
   gem_group :development, :test do
     gem "bundle-audit"
     gem "dotenv-rails"
     gem "faker"
     gem "guard"
-    gem "guard-brakeman"
     gem "guard-minitest"
+    gem "guard-brakeman"
     gem "guard-rubocop"
     gem "guard-shell"
     gem "guard-spring"
@@ -66,16 +67,17 @@ def apply_self!
   end
 
   copy_file "env.example"
-  copy_file "eslintrc.js", ".eslintrc.js"
   copy_file "Guardfile"
   copy_file "gitignore", '.gitignore', force: true
   copy_file "overcommit.yml", ".overcommit.yml"
+  copy_file "foreman", ".foreman"
+  copy_file "rubocop.yml", ".rubocop.yml"
 
   apply "circleci/template.rb"
   apply "config/template.rb"
   apply "test/template.rb"
 
-  if yes?("Do you use rvm?")
+  if yes?("Do you use rvm?", :blue)
     template "ruby-version.tt", ".ruby-version", force: true
     template "ruby-gemset.tt", ".ruby-gemset", force: true
     run "rvm use"
@@ -96,9 +98,18 @@ def apply_self!
       apply blueprint
     end
 
+    rails_command "db:migrate"
+    generate "controller home index"
 
     git :init unless existing_repository?
     git checkout: "-b main" unless existing_commits?
+
+    puts "============================================"
+    puts "App successfully created, thanks for using Railyard :)"
+    puts "Running Rubocop now"
+    puts "============================================"
+
+    run "rubocop -A"
   end
 end
 

@@ -1,9 +1,8 @@
 def apply_self!
-  if yes?("Would you like to use tailwind?")
+  if yes?("Would you like to use tailwind?", :blue)
     gem "tailwindcss-rails"
     run "bundle install"
 
-    ask("*** NOTE: If you are prompted to 'overwrite' ./bin/dev, press Y. Press enter to continue. ***", :blue)
     run "rails tailwindcss:install"
   end
 end
