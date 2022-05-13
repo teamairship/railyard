@@ -99,6 +99,12 @@ Adding a blueprint is fairly straightforward. There are some folders located in 
 
 Once the `template.rb` file is added and assuming the correct file structure is followed, the blueprint will automatically be recognized and executed on the next run.
 
+### Testing
+
+When a blueprint is added, take special care to carefully inspect the generated app. Does it work? Does it work relative to other possible option combinations? It could appear that an integration is successful initially but fail on check in or in the CI/CD stage. By ensuring the blueprint plays nice with things like foreman and overcommit, we can ensure a stable experience for everyone.
+
+Beyond manual testing, there are not currently tests for the project but would be ideal in the future.
+
 ### Branching and Merging Strategy
 
 New branches should be created for features, bug fixes, etc:
