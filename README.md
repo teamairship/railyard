@@ -1,6 +1,13 @@
-# railyard
+# Railyard
 
-Railyard is a Rails application template used to scaffold rails projects. It provides a way to easily install application dependencies at the time of project creation.
+Railyard is a tool to scaffold applications. It is meant to be extendable to create any type of project
+but mainly focuses on Rails. When you create a project with Railyard, you will be able to choose what dependencies get installed.
+
+** Note ** In terms of maturity, this project has some growing up to do. It can currently create a project successfully but be aware there may be some edge cases where selected options could conflict and some manual setup will still be required to finalize installation of some dependencies. If you run into any issues feel free to open an issue.
+
+## Long Term Vision
+
+Currently dependencies (Blueprints) are offered a lat carte (1 by 1) but longer term we'd like to offer templates that group these dependencies (Blueprints) into pre configured installations targeted at application type.
 
 ## Dependencies
 
@@ -47,7 +54,6 @@ To start scaffolding a project:
 
 Answer the questions about dependencies as you are prompted.
 
-If you see a message similar to `*** NOTE: If you are prompted to 'overwrite' ./bin/dev, press Y. Press enter to continue. ***` then enter y and press enter to continue.
 
 Change into the directory where you generated your app:
 
@@ -65,11 +71,44 @@ Make sure your node and npm versions are up to date or you might run into build 
 
 [https://stackoverflow.com/questions/70482086/rails-7-0-esbuild-running-app-gives-error-command-build-not-found](https://stackoverflow.com/questions/70482086/rails-7-0-esbuild-running-app-gives-error-command-build-not-found)
 
-## How does it work?
+## Development Details
+
+Railyard is meant to be extendable and you can add any number of Frameworks or options but currently there is only one starter template for Rails found under the `/rails` directory.
+
+There is a main `template.rb` file found in the `/rails` directory. This is the main entry point for the Rails generator and any core dependency will be listed here. Only functionality that is common between project types should be included in this file otherwise a `blueprint` should be utilized.
+
+### Blueprints
+
+Within the `/rails` directory, you will also find a `/blueprints` folder where the specific Rails options are located. Any number of `blueprints` can be added to the project. Currently there are options for Tailwind, Devise, GraphQl, JS linting, Pundit and Rspec.
+
+The current expectation is that you can select any number of blueprints and they should play nicely relative to the other selections.
+
+### How does it work?
+
+Each blueprint is a collection of [Thor][] commands.
 
 This project works by hooking into the standard Rails [application templates][] system, with some caveats. The entry point is the [template.rb][] file in the root of this repository.
 
 Rails generators are very lightly documented; what you’ll find is that most of the heavy lifting is done by [Thor][]. The most common methods used by this template are Thor’s `copy_file`, `template`, and `gsub_file`. You can dig into the well-organized and well-documented [Thor source code][thor] to learn more.
+
+Thor can run pretty much anything that could be run from the command line. It can run Ruby commands as well as node commands for example.
+
+### Adding a Blueprint
+
+Adding a blueprint is fairly straightforward. There are some folders located in `/rails/blueprints` directory to use as examples. The main concept is that each blueprint has an entry `template.rb` file. 
+
+Once the `template.rb` file is added and assuming the correct file structure is followed, the blueprint will automatically be recognized and executed on the next run.
+
+### Branching and Merging Strategy
+
+New branches should be created for features, bug fixes, etc:
+
+- feature/name-of-feature
+- bugfix/name-of-bugfix
+- hotfix/name-of-hotfix
+- release/name-of-release
+
+Pull requests are made into the `main` branch.
 
 ## MIT License
 
