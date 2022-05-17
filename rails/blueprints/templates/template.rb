@@ -9,7 +9,7 @@ def apply_self!
   end
   puts "============================"
 
-  template_option = ask("Template Number: ")
+  template_option = ask("Template Number: ", :blue)
   apply @templates[template_option.to_i]
 end
 
