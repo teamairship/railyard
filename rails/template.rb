@@ -32,7 +32,8 @@ def existing_repository?
 end
 
 def blueprints
-  @blueprints ||= Dir.glob("#{File.dirname(__FILE__)}/blueprints/**/template.rb").select { |f| f.include?('blueprints') }
+  @blueprints ||= Dir.glob("#{File.dirname(__FILE__)}/blueprints/**/template.rb")
+                     .select { |f| f.include?('blueprints') && !f.include?('templates') }
 end
 
 def apply_self!
@@ -93,9 +94,13 @@ def apply_self!
     run "bundle exec standardrb --fix", abort_on_failure: false
     run "overcommit --install"
 
-    blueprints.each do |blueprint|
-      puts "applying #{blueprint}..."
-      apply blueprint
+    if yes?("Do you want to use a template?", :blue)
+      apply "#{File.dirname(__FILE__)}/blueprints/templates/template.rb"
+    else
+      blueprints.each do |blueprint|
+        puts "Applying Blueprint: #{blueprint}..."
+        apply blueprint
+      end
     end
 
     rails_command "db:migrate"
