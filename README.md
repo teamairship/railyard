@@ -5,10 +5,6 @@ but mainly focuses on Rails. When you create a project with Railyard, you will b
 
 ** Note ** In terms of maturity, this project has some growing up to do. It can currently create a project successfully but be aware there may be some edge cases where selected options could conflict and some manual setup will still be required to finalize installation of some dependencies. If you run into any issues feel free to open an issue.
 
-## Long Term Vision
-
-Currently dependencies (Blueprints) are offered a lat carte (1 by 1) but longer term we'd like to offer templates that group these dependencies (Blueprints) into pre configured installations targeted at application type.
-
 ## Dependencies
 
 Ensure that NPM is up to date before generating an app.
@@ -77,27 +73,42 @@ Railyard is meant to be extendable and you can add any number of Frameworks or o
 
 There is a main `template.rb` file found in the `/rails` directory. This is the main entry point for the Rails generator and any core dependency will be listed here. Only functionality that is common between project types should be included in this file otherwise a `blueprint` should be utilized.
 
+### Blueprints vs Templates
+
+Currently dependencies can be installed one of two ways:
+
+- One at a time with generic configurations with `Blueprints`.
+- Many at a time with specific configurations with `Templates`.
+
 ### Blueprints
 
 Within the `/rails` directory, you will also find a `/blueprints` folder where the specific Rails options are located. Any number of `blueprints` can be added to the project. Currently there are options for Tailwind, Devise, GraphQl, JS linting, Pundit and Rspec.
 
 The current expectation is that you can select any number of blueprints and they should play nicely relative to the other selections.
 
+### Adding a Blueprint
+
+Adding a blueprint is fairly straightforward. There are some folders located in `/rails/blueprints` directory to use as examples. The main concept is that each blueprint has an entry `template.rb` file. 
+
+Once the `template.rb` file is added and assuming the correct file structure is followed, the blueprint will automatically be recognized and executed on the next run.
+
+### Templates
+
+Within the `rails/blueprints` directory you will find the `templates` folder.
+
+A `template` is a collection of `blueprints` or a collection of dependencies pre-configured in a specific way.
+
+An example template has been included in the `templates/example_template` directory. Other templates can be added by following this file structure.
+
 ### How does it work?
 
-Each blueprint is a collection of [Thor][] commands.
+Each blueprint and template is a collection of [Thor][] commands.
 
 This project works by hooking into the standard Rails [application templates][] system, with some caveats. The entry point is the [template.rb][] file in the root of this repository.
 
 Rails generators are very lightly documented; what you’ll find is that most of the heavy lifting is done by [Thor][]. The most common methods used by this template are Thor’s `copy_file`, `template`, and `gsub_file`. You can dig into the well-organized and well-documented [Thor source code][thor] to learn more.
 
 Thor can run pretty much anything that could be run from the command line. It can run Ruby commands as well as node commands for example.
-
-### Adding a Blueprint
-
-Adding a blueprint is fairly straightforward. There are some folders located in `/rails/blueprints` directory to use as examples. The main concept is that each blueprint has an entry `template.rb` file. 
-
-Once the `template.rb` file is added and assuming the correct file structure is followed, the blueprint will automatically be recognized and executed on the next run.
 
 ### Testing
 
