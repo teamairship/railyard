@@ -1,12 +1,11 @@
 def apply_self!
-  if yes?("Would you like to install rspec?", :blue)
+  if yes?("Would you like to use Rspec for testing?", :blue)
     FileUtils.rm_rf("test")
+    gem 'rubocop-rspec', require: false
     gem_group :development, :test do
       gem 'rspec-rails'
       gem 'factory_bot_rails'
       gem 'shoulda'
-      gem 'capybara'
-      gem 'database_cleaner'
     end
     run "bundle install"
     generate 'rspec:install'
@@ -16,20 +15,23 @@ def apply_self!
     empty_directory 'spec/controllers'
     empty_directory 'spec/factories'
     graphql_config
+    content = "  - rubocop-rspec\n"
+    insert_into_file '.rubocop.yml', content, after: /require:\n/
   end
 end
 
 def devise_config 
-  if yes?("Do you have devise in your project?", :blue)
+  if yes?("Should Rspec account for Devise?", :blue)
     gsub_file 'spec/rails_helper.rb', "config.filter_rails_from_backtrace", "config.filter_rails_from_backtrace\n\tconfig.include Devise::Test::ControllerHelpers, type: :controller"
   end
 end
+
 def graphql_config
-  if yes?("Do you have graphql in your project?", :blue)
+  if yes?("Should Rspec account for GraphQl", :blue)
     empty_directory 'spec/graphql/mutations'
     empty_directory 'spec/graphql/queries'
     copy_file "blueprints/rspec/schema_spec", "spec/graphql/schema_spec.rb"
   end
 end
-  apply_self!
-  
+
+apply_self!

@@ -14,7 +14,7 @@ def apply_self!
     generate "devise", model_name
 
     if yes?("Would you like to generate roles for your Devise users?", :blue)
-      generate :migration, "add_role_to_devise role:integer"
+      generate :migration, "add_role_to_#{model_name.pluralize} role:integer"
 
       roles = ask("Press return to use the default roles (admin user). Enter the roles in snake_case, separated by spaces, and press return.", :blue)
       roles = "admin user" if roles.blank?
