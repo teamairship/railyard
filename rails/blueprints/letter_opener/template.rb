@@ -4,8 +4,7 @@ def apply_self!
         gem "letter_opener"
       end
       run "bundle install"
-      insert_into_file 'config/environments/development.rb', "\n\tconfig.action_mailer.perform_deliveries = true", after: "config.action_mailer.delivery_method = :letter_opener"
-
+      environment "config.action_mailer.perform_deliveries = true", env: 'development'
     end
   end
   
