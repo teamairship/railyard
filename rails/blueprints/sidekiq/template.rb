@@ -5,10 +5,7 @@ def apply_self!
 
     environment "config.active_job.queue_adapter = :sidekiq"
     insert_into_file 'Procfile.dev', "redis: redis-server\n", after: /js: yarn build --watch\n/
-    insert_into_file 'Procfile.dev', "worker: bundle exec sidekiq -C config/sidekiq.yml\n", after: /redis: redis-server\n/
-
-    create_file 'config/sidekiq.yml'
-    insert_into_file 'config/sidekiq.yml', "development:\n  :concurrency: 5\n\nproduction:\n  :concurrency: 10\n\n:max_retries: 1\n\n:queues:\n  - default"
+    insert_into_file 'Procfile.dev', "worker: bundle exec sidekiq -c 5 -q default\n", after: /redis: redis-server\n/
 
     create_file 'config/initializers/sidekiq.rb'
     insert_into_file 'config/initializers/sidekiq.rb', "# frozen_string_literal: true\n\nrequire 'sidekiq/web'\n"
