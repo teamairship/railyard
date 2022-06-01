@@ -9,6 +9,7 @@ GEM
     ast (2.4.2)
     brakeman (5.2.3)
     coderay (1.1.3)
+    colorize (0.8.1)
     concurrent-ruby (1.1.10)
     debug (1.5.0)
       irb (>= 1.3.6)
@@ -32,9 +33,6 @@ GEM
       guard (>= 2.0.0)
       guard-compat (~> 1.0)
     guard-compat (1.2.1)
-    guard-minitest (2.4.6)
-      guard-compat (~> 1.2)
-      minitest (>= 3.0)
     guard-rubocop (1.5.0)
       guard (~> 2.0)
       rubocop (< 2.0)
@@ -100,12 +98,12 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
+  colorize
   debug
   dotenv
   faker (~> 2.11.0)
   guard
   guard-brakeman
-  guard-minitest
   guard-rubocop
   guard-shell
   guard-spring
