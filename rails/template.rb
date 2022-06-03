@@ -2,6 +2,7 @@ require 'bundler'
 require 'json'
 require 'fileutils'
 require 'shellwords'
+require 'colorize'
 
 def add_template_repository_to_source_path
   if __FILE__ =~ %r{\Ahttps?://}
@@ -47,7 +48,6 @@ def apply_self!
     gem "dotenv-rails"
     gem "faker"
     gem "guard"
-    gem "guard-minitest"
     gem "guard-brakeman"
     gem "guard-rubocop"
     gem "guard-shell"
@@ -63,7 +63,6 @@ def apply_self!
 
   gem_group :test do
     gem "database_cleaner"
-    gem "minitest-retry"
     gem "mocha"
   end
 
@@ -89,6 +88,7 @@ def apply_self!
     run "bin/setup"
     rails_command "active_storage:install"
     rails_command "db:migrate"
+    run "bundle lock --add-platform x86_64-linux"
 
     run "cp config/environments/production.rb config/environments/staging.rb"
     run "bundle exec standardrb --fix", abort_on_failure: false
@@ -109,10 +109,10 @@ def apply_self!
     git :init unless existing_repository?
     git checkout: "-b main" unless existing_commits?
 
-    puts "============================================"
-    puts "App successfully created, thanks for using Railyard :)"
-    puts "Running Rubocop now"
-    puts "============================================"
+    puts "============================================".blue
+    puts "App successfully created, thanks for using Railyard!".blue
+    puts "Now running Rubocop with rubocop -A command:".blue
+    puts "============================================".blue
 
     run "rubocop -A"
   end
