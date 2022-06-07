@@ -1,0 +1,14 @@
+Description:
+    Versioning will create api v1 and any necessary files if no current v1 exists, otherwise it will increment the api version and duplicate necessary files and allow deprecating old versions
+
+Example:
+    rails generate versioner
+
+    This will create:
+        app/controllers/api/vX
+    Adds API routes to:
+        config/routes.rb
+    if you use minitest it will also create:
+        test/controllers/api/vX
+    if you ue RSpec it will create:
+        spec/controllers/api/vX
