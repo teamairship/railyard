@@ -1,3 +1,5 @@
+![Alt text](logo.png?raw=true "Railyard")
+
 # Railyard
 
 Railyard is a tool to scaffold applications. It is meant to be extendable to create any type of project
