@@ -25,7 +25,7 @@ Lint/AmbiguousBlockAssociation:
 Style/Documentation:
   Enabled: false
 
-Gemspec/DateAssignment:
+Gemspec/DeprecatedAttributeAssignment:
   Enabled: true
 
 Layout/LineEndStringConcatenationIndentation:
